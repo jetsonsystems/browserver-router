@@ -35,15 +35,21 @@ function Router(routes) {
   router.routes = []
 
   router.route = function(route, methods) {
-    route = route
-      .replace(/[-[\]{}()+?.,\\^$|#\s]/g , "\\$&"    )
-      .replace(/:\w+/g                   , "([^\/]+)")
-      .replace(/\*\w+/g                  , "(.*?)"   )
+
+    var routeToRegExp = function(rt) { 
+      rt = rt
+        .replace(/[-[\]{}()+?.,\\^$|#\s]/g , "\\$&"    )
+        .replace(/:\w+/g                   , "([^\/]+)")
+        .replace(/\*\w+/g                  , "(.*?)"   );
+      return new RegExp("^" + rt + "$");
+    };
+
+    if (Object.prototype.toString.call(route) !== '[object RegExp]') route = routeToRegExp(route);
 
     if (typeof methods == "function") methods = {"*": methods}
 
     router.routes.push({
-      pattern: new RegExp("^" + route + "$"),
+      pattern: route,
       methods: methods
     })
 
